@@ -1,6 +1,7 @@
 package kafka
 
 import (
+	"os"
 	"fmt"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
@@ -19,7 +20,8 @@ func NewKafkaProducer(host string, port int) *KafkaProducer {
 	}
 
 	if err := kafkaProducer.createProducer(); err != nil {
-		panic(fmt.Sprintf("Could not create Kafka producer: %v", err))
+		fmt.Printf("Could not create Kafka producer: %v", err)
+		os.Exit(1)
 	}
 
 	return kafkaProducer
