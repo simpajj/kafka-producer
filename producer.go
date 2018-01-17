@@ -8,16 +8,14 @@ import (
 
 type KafkaProducer struct {
 	host     string
-	topic    string
 	port     int
 	producer *kafka.Producer
 }
 
-func NewKafkaProducer(host, topic string, port int) *KafkaProducer {
+func NewKafkaProducer(host string, port int) *KafkaProducer {
 	kafkaProducer := &KafkaProducer{
 		host:  host,
 		port:  port,
-		topic: topic,
 	}
 
 	if err := kafkaProducer.createProducer(); err != nil {
@@ -37,9 +35,9 @@ func (kp *KafkaProducer) createProducer() error {
 	return nil
 }
 
-func (kp *KafkaProducer) Produce(event []byte) {
+func (kp *KafkaProducer) Produce(event []byte, topic string) {
 	kp.producer.ProduceChannel() <- &kafka.Message{
-		TopicPartition: kafka.TopicPartition{Topic: &kp.topic, Partition: kafka.PartitionAny},
+		TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
 		Value:          event,
 	}
 }
