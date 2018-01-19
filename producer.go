@@ -8,15 +8,13 @@ import (
 )
 
 type KafkaProducer struct {
-	host     string
-	port     int
+	address  string
 	producer *kafka.Producer
 }
 
-func NewKafkaProducer(host string, port int) *KafkaProducer {
+func NewKafkaProducer(address string) *KafkaProducer {
 	kafkaProducer := &KafkaProducer{
-		host:  host,
-		port:  port,
+		address:  address,
 	}
 
 	if err := kafkaProducer.createProducer(); err != nil {
@@ -28,7 +26,7 @@ func NewKafkaProducer(host string, port int) *KafkaProducer {
 }
 
 func (kp *KafkaProducer) createProducer() error {
-	p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": fmt.Sprintf("%s:%d", kp.host, kp.port)})
+	p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": kp.address})
 	if err != nil {
 		return err
 	}
