@@ -1,7 +1,6 @@
 package kafka
 
 import (
-	"os"
 	"fmt"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
@@ -12,17 +11,16 @@ type KafkaProducer struct {
 	producer *kafka.Producer
 }
 
-func NewKafkaProducer(address string) *KafkaProducer {
+func NewKafkaProducer(address string) (*KafkaProducer, error) {
 	kafkaProducer := &KafkaProducer{
 		address:  address,
 	}
 
 	if err := kafkaProducer.createProducer(); err != nil {
-		fmt.Printf("Could not create Kafka producer: %v", err)
-		os.Exit(1)
+		return nil, fmt.Errorf("Could not create Kafka producer: %v", err)
 	}
 
-	return kafkaProducer
+	return kafkaProducer, nil
 }
 
 func (kp *KafkaProducer) createProducer() error {

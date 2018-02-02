@@ -7,7 +7,7 @@ import (
 )
 
 func TestNewProducer(t *testing.T) {
-	producer := NewKafkaProducer("localhost:9092")
+	producer, _ := NewKafkaProducer("localhost:9092")
 	assert.NotNil(t, producer)
 	assert.Equal(t, "localhost:9092", producer.address)
 }
