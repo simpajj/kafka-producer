@@ -6,13 +6,15 @@ import (
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
 
-type KafkaProducer struct {
+// Producer holds the broker address and the Confluent Kafka producer
+type Producer struct {
 	address  string
 	producer *kafka.Producer
 }
 
-func NewKafkaProducer(address string) (*KafkaProducer, error) {
-	kafkaProducer := &KafkaProducer{
+// NewProducer returns a new producer with bootstrap.servers set to the supplied address
+func NewProducer(address string) (*Producer, error) {
+	kafkaProducer := &Producer{
 		address:  address,
 	}
 
@@ -23,7 +25,7 @@ func NewKafkaProducer(address string) (*KafkaProducer, error) {
 	return kafkaProducer, nil
 }
 
-func (kp *KafkaProducer) createProducer() error {
+func (kp *Producer) createProducer() error {
 	p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": kp.address})
 	if err != nil {
 		return err
@@ -33,13 +35,24 @@ func (kp *KafkaProducer) createProducer() error {
 	return nil
 }
 
-func (kp *KafkaProducer) Produce(event []byte, topic string) {
+// Produce sends the event to the given topic
+func (kp *Producer) Produce(event []byte, topic string) {
 	kp.producer.ProduceChannel() <- &kafka.Message{
 		TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
 		Value:          event,
 	}
 }
 
-func (kp *KafkaProducer) Teardown() {
+// GetMetadata returns the metadata of all available topics in the Kafka cluster
+func (kp *Producer) GetMetadata(timeout int) (*kafka.Metadata, error) {
+	metadata, err := kp.producer.GetMetadata(nil, true, timeout)
+	if err != nil {
+		return nil, err
+	}
+	return metadata, nil
+}
+
+// Teardown closes the producer instance
+func (kp *Producer) Teardown() {
 	kp.producer.Close()
 }
